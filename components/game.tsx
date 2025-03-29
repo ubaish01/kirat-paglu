@@ -17,7 +17,10 @@ export default function Game() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [completionTime, setCompletionTime] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [submittingScore, setSubmittingScore] = useState(false);
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [scoreError, setScoreError] = useState<string | null>(null);
 
   // Simulate loading completion
   useEffect(() => {
@@ -32,20 +35,55 @@ export default function Game() {
       const endTime = Date.now();
       const timeTaken = endTime - startTime;
       setCompletionTime(timeTaken);
+
+      // Submit score to leaderboard
+      submitScore(username, timeTaken);
     }
     setGameState("won");
+  };
+
+  const submitScore = async (username: string, time: number) => {
+    if (!username || !time) return;
+
+    try {
+      setSubmittingScore(true);
+      setScoreError(null);
+
+      const response = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, time }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit score");
+      }
+
+      setScoreSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting score:", error);
+      setScoreError("Failed to submit your score to the leaderboard");
+    } finally {
+      setSubmittingScore(false);
+    }
   };
 
   const startGame = (username: string) => {
     setUsername(username);
     setStartTime(Date.now());
     setCompletionTime(null);
+    setScoreSubmitted(false);
+    setScoreError(null);
     setGameState("playing");
   };
 
   const restartGame = () => {
     setStartTime(Date.now());
     setCompletionTime(null);
+    setScoreSubmitted(false);
+    setScoreError(null);
     setGameState("playing");
   };
 
@@ -69,6 +107,9 @@ export default function Game() {
         onRestart={restartGame}
         completionTime={completionTime || undefined}
         isDarkTheme={isDarkTheme}
+        scoreSubmitted={scoreSubmitted}
+        submittingScore={submittingScore}
+        scoreError={scoreError}
       />
 
       {isLoading ? (

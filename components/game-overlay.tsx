@@ -1,9 +1,18 @@
+// src/components/game-overlay.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Trophy, Sparkles, Award, Star, ArrowRight } from "lucide-react";
+import {
+  Heart,
+  Trophy,
+  Sparkles,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { LeaderboardDisplay } from "./leaderboard-display";
 import clsx from "clsx";
 
 type GameOverlayProps = {
@@ -12,6 +21,9 @@ type GameOverlayProps = {
   onRestart: () => void;
   completionTime?: number;
   isDarkTheme?: boolean;
+  scoreSubmitted?: boolean;
+  submittingScore?: boolean;
+  scoreError?: string | null;
 };
 
 export function GameOverlay({
@@ -19,7 +31,10 @@ export function GameOverlay({
   onStart,
   onRestart,
   completionTime,
-  isDarkTheme,
+  isDarkTheme = false,
+  scoreSubmitted = false,
+  submittingScore = false,
+  scoreError = null,
 }: GameOverlayProps) {
   const [username, setUsername] = useState("");
   const [isAnimating, setIsAnimating] = useState(true);
@@ -89,7 +104,7 @@ export function GameOverlay({
   return (
     <div
       className={clsx(
-        "absolute inset-0 flex items-center  justify-center z-10 backdrop-blur-sm",
+        "absolute inset-0 flex items-center justify-center z-10 backdrop-blur-sm",
         isDarkTheme ? "bg-[#000]" : "bg-[#fff]"
       )}
     >
@@ -237,16 +252,18 @@ export function GameOverlay({
         }
       `}</style>
 
-      <div
-        className={`${
-          isDarkTheme
-            ? "bg-slate-800/90 text-white"
-            : "bg-white/90 text-slate-900"
-        } p-8 rounded-lg shadow-2xl max-w-md text-center relative overflow-hidden`}
-      >
-        {gameState === "start" ? (
-          <>
-            <div className="relative mb-6 float-animation">
+      {gameState === "start" ? (
+        // Start Screen with side-by-side layout
+        <div className="flex flex-col md:flex-row w-full max-w-6xl mx-4 gap-6">
+          {/* Left Section - Start Card */}
+          <div
+            className={`${
+              isDarkTheme
+                ? "bg-slate-800/90 text-white"
+                : "bg-white/90 text-slate-900"
+            } p-6 rounded-lg shadow-xl md:w-2/5 text-center relative`}
+          >
+            <div className="relative mb-4 float-animation">
               <div className="absolute -top-1 -right-1">
                 <Sparkles
                   className={`h-6 w-6 ${
@@ -262,7 +279,7 @@ export function GameOverlay({
                   fill={isDarkTheme ? "#ec4899" : "#db2777"}
                 />
                 <h1
-                  className={`text-4xl font-extrabold mb-1 ${
+                  className={`text-3xl font-extrabold mb-1 ${
                     isDarkTheme
                       ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400"
                       : "text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600"
@@ -278,7 +295,7 @@ export function GameOverlay({
                 />
               </div>
               <h2
-                className={`text-xl font-bold ${
+                className={`text-lg font-bold ${
                   isDarkTheme ? "text-purple-300" : "text-purple-600"
                 }`}
               >
@@ -287,7 +304,7 @@ export function GameOverlay({
             </div>
 
             <div
-              className={`p-4 mb-6 rounded-lg shine-effect ${
+              className={`p-4 mb-4 rounded-lg shine-effect ${
                 isDarkTheme
                   ? "bg-gradient-to-r from-pink-900/40 to-purple-900/40 border border-pink-700/30"
                   : "bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200"
@@ -305,7 +322,7 @@ export function GameOverlay({
             </div>
 
             {/* Username input */}
-            <div className="mb-5">
+            <div className="mb-4">
               <label
                 htmlFor="username"
                 className={`block text-sm font-medium ${
@@ -329,7 +346,7 @@ export function GameOverlay({
             </div>
 
             <div
-              className={`mb-5 p-3 rounded-lg ${
+              className={`mb-4 p-3 rounded-lg ${
                 isDarkTheme ? "bg-slate-700/50" : "bg-slate-100"
               }`}
             >
@@ -399,144 +416,116 @@ export function GameOverlay({
                 Start Challenge <ArrowRight className="h-5 w-5" />
               </span>
             </Button>
-          </>
-        ) : (
-          <>
+          </div>
+
+          {/* Right Section - Leaderboard */}
+          <div
+            className={`${
+              isDarkTheme
+                ? "bg-slate-800/90 text-white"
+                : "bg-white/90 text-slate-900"
+            } p-6 rounded-lg shadow-xl md:w-3/5 overflow-auto`}
+          >
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Trophy
+                className={`h-6 w-6 ${
+                  isDarkTheme ? "text-yellow-300" : "text-yellow-500"
+                }`}
+              />
+              <h2
+                className={`text-xl font-bold ${
+                  isDarkTheme ? "text-pink-300" : "text-pink-600"
+                }`}
+              >
+                Leaderboard
+              </h2>
+            </div>
+            <LeaderboardDisplay isDarkTheme={isDarkTheme} />
+          </div>
+        </div>
+      ) : (
+        /* Win Screen - Simplified */
+        <div
+          className={`${
+            isDarkTheme
+              ? "bg-slate-800/90 text-white"
+              : "bg-white/90 text-slate-900"
+          } p-6 rounded-lg shadow-xl max-w-md text-center relative overflow-hidden mx-4`}
+        >
+          <div className="flex flex-col">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500"></div>
 
-            <div className="flex justify-center mb-2">
-              <div
-                className={`p-3 rounded-full ${
-                  isDarkTheme ? "bg-pink-700/40" : "bg-pink-100"
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Trophy
+                className={`h-6 w-6 ${
+                  isDarkTheme ? "text-yellow-300" : "text-yellow-500"
+                }`}
+              />
+              <h1
+                className={`text-2xl font-bold ${
+                  isDarkTheme ? "text-pink-300" : "text-pink-600"
                 }`}
               >
-                <Trophy
-                  className={`h-8 w-8 ${
-                    isDarkTheme ? "text-yellow-300" : "text-yellow-500"
-                  }`}
-                />
-              </div>
-            </div>
-
-            <h1
-              className={`text-3xl font-extrabold mb-2 ${
-                isDarkTheme ? "text-pink-300" : "text-pink-600"
-              }`}
-            >
-              True Fan Status: Achieved!
-            </h1>
-
-            <div className="relative mb-6">
-              <div
-                className={`px-4 py-3 mb-2 rounded-lg ${
-                  isDarkTheme ? "bg-slate-700/50" : "bg-slate-100"
-                }`}
-              >
-                <p className="mb-2 font-medium">
-                  You've conquered the KiratPaglu Final Boss Challenge!
-                </p>
-                <p className="text-sm">
-                  Your dedication to Kirat is unmatched and you've earned your
-                  place as a true superfan!
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-2 mt-4 mb-2">
-                <Star fill="#FFD700" color="transparent" className="h-5 w-5" />
-                <Star fill="#FFD700" color="transparent" className="h-5 w-5" />
-                <Star fill="#FFD700" color="transparent" className="h-5 w-5" />
-                <Star fill="#FFD700" color="transparent" className="h-5 w-5" />
-                <Star fill="#FFD700" color="transparent" className="h-5 w-5" />
-              </div>
-
-              <div className="text-center mb-2">
-                <span className="text-xs font-medium uppercase tracking-wider">
-                  Elite Fan Score
-                </span>
-              </div>
+                Challenge Complete!
+              </h1>
             </div>
 
             {/* Show completion time */}
             {completionTime && (
-              <div
-                className={`mb-6 p-4 ${
-                  isDarkTheme ? "bg-pink-900/30" : "bg-pink-50"
-                } rounded-md border-2 ${
-                  isDarkTheme ? "border-pink-700/50" : "border-pink-200"
-                }`}
-              >
-                <p
-                  className={`text-sm ${
-                    isDarkTheme ? "text-pink-300" : "text-pink-700"
+              <div className="mb-4 text-center">
+                <div
+                  className={`inline-block px-5 py-2 rounded-lg ${
+                    isDarkTheme ? "bg-pink-900/30" : "bg-pink-50"
                   }`}
                 >
-                  Your amazing time:
-                </p>
-                <p
-                  className={`text-3xl font-bold ${
-                    isDarkTheme ? "text-pink-300" : "text-pink-600"
-                  }`}
-                >
-                  {formatTime(completionTime)}
-                </p>
-
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <Award
-                    className={`h-5 w-5 ${
-                      isDarkTheme ? "text-yellow-300" : "text-yellow-500"
-                    }`}
-                  />
-                  <p
-                    className={`text-sm font-medium ${
-                      isDarkTheme ? "text-yellow-300" : "text-yellow-600"
-                    }`}
-                  >
-                    Kirat's Certified Superfan
+                  <p className="text-xl font-bold">
+                    {formatTime(completionTime)}
                   </p>
                 </div>
               </div>
             )}
 
-            <div
-              className={`p-4 mb-6 rounded-lg border ${
-                isDarkTheme
-                  ? "bg-slate-700/50 border-slate-600"
-                  : "bg-white border-slate-200"
-              }`}
-            >
-              <p className="font-medium mb-2">Share your achievement!</p>
-              <p className="text-sm mb-3">
-                You've won a follow back from yr_hexadecimal. Post this
-                achievement or DM to get a follow on X (Twitter).
-              </p>
+            {/* Score submission status */}
+            <div className="mb-4 text-center">
+              {submittingScore && (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin border-pink-500"></div>
+                  <span className="text-sm">Submitting score...</span>
+                </div>
+              )}
 
-              <div
-                className={`p-3 rounded text-sm mb-2 text-left ${
-                  isDarkTheme ? "bg-slate-800" : "bg-slate-100"
-                }`}
-              >
-                <code>
-                  Just beat the KiratPaglu Final Boss Challenge in{" "}
-                  {completionTime ? formatTime(completionTime) : "record time"}!
-                  Officially Kirat's biggest fan 🏆 @yr_hexadecimal
-                  #KiratPagluChallenge
-                </code>
-              </div>
+              {scoreSubmitted && (
+                <div className="flex items-center justify-center gap-2 text-green-500">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    Added to leaderboard!
+                  </span>
+                </div>
+              )}
+
+              {scoreError && (
+                <div className="flex items-center justify-center gap-2 text-red-500">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm">{scoreError}</span>
+                </div>
+              )}
             </div>
 
-            <Button
-              onClick={onRestart}
-              className={`w-full py-3 text-base font-bold ${
-                isDarkTheme
-                  ? "bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
-                  : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-              }`}
-            >
-              Play Again
-            </Button>
-          </>
-        )}
-      </div>
+            <div className="flex gap-3 mt-2">
+              <Button
+                onClick={onRestart}
+                className={`py-2 px-6 flex-1 font-medium ${
+                  isDarkTheme
+                    ? "bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
+                    : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                }`}
+              >
+                Play Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex absolute bottom-10 flex-col items-center justify-center">
         <p className="text-sm sm:text-base">

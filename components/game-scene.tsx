@@ -342,7 +342,7 @@ function createRoadSignTexture() {
     ctx.font = "bold 55px Arial, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("KiratPaglu", canvas.width / 2, canvas.height / 2 - 18);
+    ctx.fillText("🥰KiratPaglu🥰", canvas.width / 2, canvas.height / 2 - 18);
 
     // Add "Final Boss" text with contrasting color
     ctx.shadowBlur = 3;
@@ -351,7 +351,7 @@ function createRoadSignTexture() {
 
     ctx.fillStyle = "#f72585"; // Bright pink for contrast
     ctx.font = "bold 42px Impact, fantasy";
-    ctx.fillText("FINAL BOSS", canvas.width / 2, canvas.height / 2 + 25);
+    ctx.fillText("🤟🏻FINAL BOSS🤟🏻", canvas.width / 2, canvas.height / 2 + 25);
 
     // Reset shadow for performance
     ctx.shadowColor = "transparent";

@@ -50,6 +50,9 @@ importers:
       three:
         specifier: ^0.175.0
         version: 0.175.0
+      timeago.js:
+        specifier: ^4.0.2
+        version: 4.0.2
       tw-animate-css:
         specifier: ^1.2.5
         version: 1.2.5
@@ -897,6 +900,9 @@ packages:
   three@0.175.0:
     resolution: {integrity: sha512-nNE3pnTHxXN/Phw768u0Grr7W4+rumGg/H6PgeseNJojkJtmeHJfZWi41Gp2mpXl1pg1pf1zjwR4McM1jTqkpg==}
 
+  timeago.js@4.0.2:
+    resolution: {integrity: sha512-a7wPxPdVlQL7lqvitHGGRsofhdwtkoSXPGATFuSOA2i1ZNQEPLrGnj68vOp2sOJTCFAQVXPeNMX/GctBaO9L2w==}
+
   troika-three-text@0.52.3:
     resolution: {integrity: sha512-jLhiwgV8kEkwWjvK12f2fHVpbOC75p7SgPQ0cgcz+IMtN5Bdyg4EuFdwuTOVu9ga8UeYdKBpzd1AxviyixtYTQ==}
     peerDependencies:
@@ -1695,6 +1701,8 @@ snapshots:
       three: 0.175.0
 
   three@0.175.0: {}
+
+  timeago.js@4.0.2: {}
 
   troika-three-text@0.52.3(three@0.175.0):
     dependencies:
