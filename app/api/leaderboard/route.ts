@@ -33,17 +33,23 @@ export async function GET() {
       if (file.endsWith(".json")) {
         const filePath = path.join(leaderboardDir, file);
         const fileContent = fs.readFileSync(filePath, "utf-8");
-        const userData = JSON.parse(fileContent);
 
-        // Get the best time for this user
-        const bestEntry = userData.scores.reduce(
-          (best: LeaderboardEntry | null, current: LeaderboardEntry) =>
-            !best || current.time < best.time ? current : best,
-          null
-        );
+        try {
+          const userData = JSON.parse(fileContent);
 
-        if (bestEntry) {
-          entries.push(bestEntry);
+          // Get the best time for this user
+          const bestEntry = userData.scores.reduce(
+            (best: LeaderboardEntry | null, current: LeaderboardEntry) =>
+              !best || current.time < best.time ? current : best,
+            null
+          );
+
+          if (bestEntry) {
+            entries.push(bestEntry);
+          }
+        } catch (error) {
+          console.warn(`Skipping invalid JSON file: ${file}`);
+          continue;
         }
       }
     }
